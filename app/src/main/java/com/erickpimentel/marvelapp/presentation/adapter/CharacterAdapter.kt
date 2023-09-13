@@ -33,6 +33,8 @@ class CharacterAdapter @Inject constructor(): PagingDataAdapter<Character, Chara
 
                 val imageUrl = "${character.thumbnail}/portrait_xlarge.${character.thumbnailExtension}"
                 Glide.with(binding.root.context).load(imageUrl).into(characterImageView)
+
+                characterDescription.text = character.description
             }
         }
     }
