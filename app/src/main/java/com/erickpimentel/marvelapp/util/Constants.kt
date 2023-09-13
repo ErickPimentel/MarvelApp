@@ -10,8 +10,7 @@ class Constants {
         const val BASE_URL = "https://gateway.marvel.com"
         val timeStamp = Timestamp(System.currentTimeMillis()).time.toString()
         const val API_KEY = ""
-        const val PRIVATE_KEY = ""
-        const val limit = "20"
+        private const val PRIVATE_KEY = ""
 
         fun hash(): String {
             val input = "$timeStamp$PRIVATE_KEY$API_KEY"
