@@ -1,27 +1,178 @@
 package com.erickpimentel.marvelapp.presentation.ui
 
+import android.annotation.SuppressLint
+import android.app.SearchManager
+import android.content.Context
+import android.database.Cursor
+import android.database.MatrixCursor
 import android.os.Bundle
+import android.provider.BaseColumns
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.CursorAdapter
+import android.widget.SearchView
+import android.widget.SimpleCursorAdapter
+import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
+import androidx.paging.cachedIn
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.erickpimentel.marvelapp.R
 import com.erickpimentel.marvelapp.databinding.FragmentSearchBinding
+import com.erickpimentel.marvelapp.presentation.adapter.CharacterAdapter
+import com.erickpimentel.marvelapp.presentation.adapter.LoadMoreAdapter
+import com.erickpimentel.marvelapp.presentation.viewmodel.CharactersViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
-    private val binding get() = _binding
+    private val binding get() = _binding!!
+
+    private val charactersViewModel: CharactersViewModel by activityViewModels()
+
+    @Inject
+    lateinit var characterAdapter: CharacterAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
-        return binding?.root
+        setupRecyclerView()
+
+        val cursorAdapter = setCursorAdapter()
+
+        setOnQueryTextListener(cursorAdapter, charactersViewModel.suggestionsList)
+
+        setOnSuggestionListener()
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                characterAdapter.loadStateFlow.collectLatest { loadState ->
+                    binding.recyclerView.isVisible = loadState.refresh !is LoadState.Error
+                    binding.noResults.isVisible = loadState.refresh is LoadState.Error
+                }
+            }
+        }
+
+        characterAdapter.setOnItemClickListener {
+            charactersViewModel.addSuggestion(binding.searchView.query.toString())
+        }
+
+
+        return binding.root
+    }
+
+    private fun setupRecyclerView() {
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+
+            adapter = characterAdapter.withLoadStateFooter(
+                LoadMoreAdapter{
+                    characterAdapter.retry()
+                }
+            )
+        }
+    }
+
+    private fun setCursorAdapter(): SimpleCursorAdapter {
+        val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1)
+        val to = intArrayOf(R.id.item_label)
+        val cursorAdapter = SimpleCursorAdapter(context, R.layout.search_item, null, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER)
+        binding.searchView.suggestionsAdapter = cursorAdapter
+        return cursorAdapter
+    }
+
+    private fun setOnSuggestionListener() {
+        binding.searchView.setOnSuggestionListener(object : SearchView.OnSuggestionListener {
+            override fun onSuggestionSelect(p0: Int): Boolean {
+                return false
+            }
+
+
+            override fun onSuggestionClick(p0: Int): Boolean {
+                view?.hideKeyboard()
+                val cursor = binding.searchView.suggestionsAdapter.getItem(p0) as Cursor
+                val columnIndex = cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
+                if (columnIndex >= 0){
+                    val selection = cursor.getString(columnIndex)
+                    binding.searchView.setQuery(selection, false)
+                }
+                return true
+            }
+
+        })
+    }
+
+    private fun setOnQueryTextListener(cursorAdapter: SimpleCursorAdapter, suggestions: List<String>) {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                view?.hideKeyboard()
+                charactersViewModel.updateQuery(p0)
+
+                lifecycleScope.launch {
+                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                        getSearchResult()
+                    }
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(p0: String?): Boolean {
+                charactersViewModel.updateQuery(p0)
+                populateCursorAdapterWithMatchingSuggestions(p0, suggestions, cursorAdapter)
+
+                lifecycleScope.launch {
+                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                        getSearchResult()
+                    }
+                }
+                return false
+            }
+        })
+    }
+
+    private fun getSearchResult(){
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                val bookList = charactersViewModel.getSearchResultStream(
+                    nameStartsWith = charactersViewModel.currentQuery.value
+                ).cachedIn(lifecycleScope)
+                bookList.collect{
+                    characterAdapter.submitData(it)
+                }
+            }
+        }
+    }
+
+    private fun populateCursorAdapterWithMatchingSuggestions(newText: String?, suggestions: List<String>, cursorAdapter: SimpleCursorAdapter) {
+        val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
+        newText?.let {
+            suggestions.forEachIndexed { index, suggestion ->
+                if (suggestion.contains(newText, true) && suggestion.isNotEmpty()) {
+                    cursor.addRow(arrayOf(index, suggestion))
+                }
+            }
+        }
+        cursorAdapter.changeCursor(cursor)
+    }
+
+    fun View.hideKeyboard(){
+        val imn = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imn.hideSoftInputFromWindow(windowToken, 0)
     }
 
 }
