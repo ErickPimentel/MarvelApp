@@ -6,7 +6,7 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class GetAllCharactersUseCase @Inject constructor(private val marvelRepository: MarvelRepository) {
-    suspend operator fun invoke(offset: Int, limit: Int): Response<CharactersDTO> {
-        return marvelRepository.getAllCharacters(offset, limit)
+    suspend operator fun invoke(nameStartsWith: String?,offset: Int, limit: Int): Response<CharactersDTO> {
+        return marvelRepository.getAllCharacters(nameStartsWith, offset, limit)
     }
 }

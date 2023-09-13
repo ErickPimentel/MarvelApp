@@ -7,8 +7,8 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class MarvelRepositoryImpl @Inject constructor(private val marvelApiService: MarvelApiService): MarvelRepository{
-    override suspend fun getAllCharacters(offset: Int, limit: Int): Response<CharactersDTO> {
-        return marvelApiService.getAllCharacters(offset = offset.toString(), limit = limit.toString())
+    override suspend fun getAllCharacters(nameStartsWith: String?, offset: Int, limit: Int): Response<CharactersDTO> {
+        return marvelApiService.getAllCharacters(nameStartsWith = nameStartsWith, offset = offset.toString(), limit = limit.toString())
     }
 
 }

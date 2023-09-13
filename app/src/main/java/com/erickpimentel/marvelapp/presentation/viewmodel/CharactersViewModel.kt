@@ -17,32 +17,11 @@ class CharactersViewModel @Inject constructor(
     private val getAllCharactersUseCase: GetAllCharactersUseCase
 ) : ViewModel() {
 
-//    private val _marvelValue = MutableStateFlow(MarvelListState())
-//    var marvelValue : StateFlow<MarvelListState> = _marvelValue
-//    fun getAllCharactersData(offset: Int) = viewModelScope.launch(Dispatchers.IO) {
-//        getAllCharactersUseCase.invoke(offset = offset).collect {
-//            when(it){
-//                is ApiResult.Success -> {
-//                    _marvelValue.value = MarvelListState(characterList = it.data?: emptyList())
-//                    Log.d("CharactersViewModel", "Success - getAllCharactersData - it.data: ${it.data}")
-//                }
-//                is ApiResult.Loading -> {
-//                    _marvelValue.value = MarvelListState(isLoading = true)
-//                    Log.d("CharactersViewModel", "Loading")
-//                }
-//                is ApiResult.Error -> {
-//                    _marvelValue.value = MarvelListState(error = it.message?: "An Unexpected Error")
-//                    Log.d("CharactersViewModel", "getAllCharactersData - it.message: ${it.message}")
-//                }
-//            }
-//        }
-//    }
-
     val charactersList = getSearchResultStream().cachedIn(viewModelScope)
     fun getSearchResultStream(): Flow<PagingData<Character>> {
         return Pager(
             config = PagingConfig(1),
-            pagingSourceFactory = { CharacterPagingSource(getAllCharactersUseCase) }
+            pagingSourceFactory = { CharacterPagingSource(getAllCharactersUseCase, null) }
         ).flow
     }
 }

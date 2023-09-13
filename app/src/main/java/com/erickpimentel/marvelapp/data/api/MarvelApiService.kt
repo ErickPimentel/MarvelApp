@@ -13,6 +13,7 @@ interface MarvelApiService {
         @Query("apikey") apikey: String = Constants.API_KEY,
         @Query("ts") ts: String = Constants.timeStamp,
         @Query("hash") hash: String = Constants.hash(),
+        @Query("nameStartsWith") nameStartsWith: String?,
         @Query("offset") offset: String,
         @Query("limit") limit: String,
     ): Response<CharactersDTO>

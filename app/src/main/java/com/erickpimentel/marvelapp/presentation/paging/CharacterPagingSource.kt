@@ -6,7 +6,10 @@ import androidx.paging.PagingState
 import com.erickpimentel.marvelapp.domain.usecases.GetAllCharactersUseCase
 import com.erickpimentel.marvelapp.domain.model.Character
 
-class CharacterPagingSource(private val getAllCharactersUseCase: GetAllCharactersUseCase) : PagingSource<Int, Character>() {
+class CharacterPagingSource(
+    private val getAllCharactersUseCase: GetAllCharactersUseCase,
+    private val nameStartsWith: String?,
+) : PagingSource<Int, Character>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Character> {
         return try {
@@ -15,6 +18,7 @@ class CharacterPagingSource(private val getAllCharactersUseCase: GetAllCharacter
             val offset = pageNumber * PAGE_SIZE
 
             val response = getAllCharactersUseCase(
+                nameStartsWith = nameStartsWith,
                 offset = offset,
                 limit = PAGE_SIZE
             )
