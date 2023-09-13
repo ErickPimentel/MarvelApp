@@ -12,28 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:queryHint="Character name"
+        android:queryHint="Name"
         android:theme="@style/WhiteSearchView"
         android:iconifiedByDefault="false"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="50dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/search_view_background"
         android:queryBackground="@android:color/transparent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/filter_image_view"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
-
-    <ImageView
-        android:id="@+id/filter_image_view"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/ic_filter_24dp"
-        app:layout_constraintStart_toEndOf="@id/search_view"
-        app:layout_constraintTop_toTopOf="@id/search_view"
-        app:layout_constraintBottom_toBottomOf="@id/search_view"
-        android:contentDescription="Filter" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -45,7 +35,6 @@
         app:layout_constraintEnd_toEndOf="@id/search_view"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="50dp"/>
-
 
     <TextView
         android:id="@+id/no_results"
