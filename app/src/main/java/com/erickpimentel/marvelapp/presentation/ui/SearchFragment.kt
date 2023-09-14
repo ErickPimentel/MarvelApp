@@ -1,6 +1,5 @@
 package com.erickpimentel.marvelapp.presentation.ui
 
-import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.content.Context
 import android.database.Cursor
@@ -157,10 +156,10 @@ class SearchFragment : Fragment() {
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                val bookList = charactersViewModel.getSearchResultStream(
+                val charactersList = charactersViewModel.getSearchResultStream(
                     nameStartsWith = charactersViewModel.currentQuery.value
                 ).cachedIn(lifecycleScope)
-                bookList.collect{
+                charactersList.collect{
                     characterAdapter.submitData(it)
                 }
             }

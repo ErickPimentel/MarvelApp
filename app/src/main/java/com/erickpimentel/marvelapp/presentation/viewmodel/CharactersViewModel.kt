@@ -13,7 +13,6 @@ import com.erickpimentel.marvelapp.domain.usecases.GetAllCharactersUseCase
 import com.erickpimentel.marvelapp.presentation.paging.CharacterPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 @HiltViewModel
 class CharactersViewModel @Inject constructor(
@@ -45,7 +44,7 @@ class CharactersViewModel @Inject constructor(
     val charactersList = getSearchResultStream(nameStartsWith = null).cachedIn(viewModelScope)
     fun getSearchResultStream(nameStartsWith: String?): Flow<PagingData<Character>> {
         return Pager(
-            config = PagingConfig(1),
+            config = PagingConfig(20),
             pagingSourceFactory = { CharacterPagingSource(getAllCharactersUseCase, nameStartsWith) }
         ).flow
     }
