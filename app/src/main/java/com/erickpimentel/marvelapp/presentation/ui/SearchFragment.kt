@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erickpimentel.marvelapp.R
@@ -61,8 +62,8 @@ class SearchFragment : Fragment() {
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 characterAdapter.loadStateFlow.collectLatest { loadState ->
-                    binding.recyclerView.isVisible = loadState.refresh !is LoadState.Error
-                    binding.noResults.isVisible = loadState.refresh is LoadState.Error
+                    binding.recyclerView.isVisible = characterAdapter.itemCount > 0 && loadState.refresh !is LoadState.Error
+                    binding.noResults.isVisible = (characterAdapter.itemCount == 0 || loadState.refresh is LoadState.Error) && !charactersViewModel.currentQuery.value.isNullOrEmpty()
                 }
             }
         }
@@ -124,7 +125,10 @@ class SearchFragment : Fragment() {
 
                 lifecycleScope.launch {
                     viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                        getSearchResult()
+
+                        if (p0.isNullOrEmpty()) characterAdapter.submitData(PagingData.empty())
+                        else getSearchResult()
+
                     }
                 }
                 return false
@@ -132,11 +136,16 @@ class SearchFragment : Fragment() {
 
             override fun onQueryTextChange(p0: String?): Boolean {
                 charactersViewModel.updateQuery(p0)
-                populateCursorAdapterWithMatchingSuggestions(p0, suggestions, cursorAdapter)
 
                 lifecycleScope.launch {
                     viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                        getSearchResult()
+
+                        if (p0.isNullOrEmpty()) characterAdapter.submitData(PagingData.empty())
+                         else {
+                            populateCursorAdapterWithMatchingSuggestions(p0, suggestions, cursorAdapter)
+                            getSearchResult()
+                        }
+
                     }
                 }
                 return false
@@ -173,6 +182,11 @@ class SearchFragment : Fragment() {
     fun View.hideKeyboard(){
         val imn = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imn.hideSoftInputFromWindow(windowToken, 0)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

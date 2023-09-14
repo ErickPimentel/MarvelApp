@@ -13,6 +13,7 @@ import com.erickpimentel.marvelapp.domain.usecases.GetAllCharactersUseCase
 import com.erickpimentel.marvelapp.presentation.paging.CharacterPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 @HiltViewModel
 class CharactersViewModel @Inject constructor(

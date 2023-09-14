@@ -18,7 +18,7 @@ class CharacterPagingSource(
             val offset = pageNumber * PAGE_SIZE
 
             val response = getAllCharactersUseCase(
-                nameStartsWith = nameStartsWith,
+                nameStartsWith = if (nameStartsWith.isNullOrEmpty()) null else nameStartsWith,
                 offset = offset,
                 limit = PAGE_SIZE
             )

@@ -1,5 +1,6 @@
 package com.erickpimentel.marvelapp.data.di
 
+import android.util.Log
 import com.erickpimentel.marvelapp.data.api.MarvelApiService
 import com.erickpimentel.marvelapp.data.repository.MarvelRepositoryImpl
 import com.erickpimentel.marvelapp.domain.repository.MarvelRepository
@@ -8,8 +9,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -23,19 +24,11 @@ object ApiModule {
     fun provideOkHttpClient(): OkHttpClient {
         val httpClientBuilder = OkHttpClient.Builder()
 
-        val authorizationInterceptor = Interceptor { chain ->
-            val requestBuilder = chain.request().newBuilder()
-
-//            val decryptedToken = keyStoreUtils.decryptToken(
-//                keyStoreUtils.getEncryptedToken(context),
-//                keyStoreUtils.generateOrRetrieveSecretKey()
-//            )
-//
-//            requestBuilder.addHeader("Authorization", "Bearer $decryptedToken")
-
-            chain.proceed(requestBuilder.build())
+        val loggingInterceptor = HttpLoggingInterceptor { message ->
+            Log.d("OkHttp", message)
         }
-        httpClientBuilder.addInterceptor(authorizationInterceptor)
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
+        httpClientBuilder.addInterceptor(loggingInterceptor)
 
 
         return httpClientBuilder.build()
