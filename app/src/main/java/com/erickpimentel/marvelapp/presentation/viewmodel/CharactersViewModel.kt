@@ -38,7 +38,7 @@ class CharactersViewModel @Inject constructor(
     }
 
     fun addSuggestion(suggestion: String){
-        insertSuggestion(suggestion)
+        if (!suggestionsList.contains(suggestion)) insertSuggestion(suggestion)
     }
 
     val charactersList = getSearchResultStream(nameStartsWith = null).cachedIn(viewModelScope)
