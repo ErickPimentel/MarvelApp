@@ -14,7 +14,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erickpimentel.marvelapp.R
+import com.erickpimentel.marvelapp.data.network.ApiResult
 import com.erickpimentel.marvelapp.databinding.FragmentHomeBinding
+import com.erickpimentel.marvelapp.presentation.adapter.CarouselAdapter
 import com.erickpimentel.marvelapp.presentation.adapter.CharacterAdapter
 import com.erickpimentel.marvelapp.presentation.adapter.LoadMoreAdapter
 import com.erickpimentel.marvelapp.presentation.ui.characterDetails.CharacterDetailsViewModel
@@ -64,13 +66,32 @@ class HomeFragment : Fragment() {
 
         binding.apply {
 
+            getFirstFiveCharacters()
+
             setupCharactersList()
 
             setupLoadStateHandling()
+
         }
 
         setOnItemClickListener()
 
+    }
+
+    private fun FragmentHomeBinding.getFirstFiveCharacters() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            when (val apiResult = homeViewModel.getFirstFiveCharacters()) {
+                is ApiResult.Success -> {
+                    val characters = apiResult.response.body()?.data?.results?.map { it.toCharacter() } ?: emptyList()
+                    val carouselAdapter = CarouselAdapter(characters)
+                    carouselRecyclerView.adapter = carouselAdapter
+                }
+
+                is ApiResult.Error -> {
+                    requireView().showSnackBar(R.string.no_internet_connection)
+                }
+            }
+        }
     }
 
     private fun setupCharactersList() {
@@ -92,9 +113,7 @@ class HomeFragment : Fragment() {
 
                     if (state is LoadState.Error) {
                         when (state.error) {
-                            is UnknownHostException -> {
-                                requireView().showSnackBar(R.string.no_internet_connection)
-                            }
+                            is UnknownHostException -> requireView().showSnackBar(R.string.no_internet_connection)
                         }
                     }
                 }

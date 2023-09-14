@@ -1,6 +1,7 @@
 package com.erickpimentel.marvelapp.data.api
 
 import com.erickpimentel.marvelapp.data.dto.CharactersDTO
+import com.erickpimentel.marvelapp.data.network.ApiResult
 import com.erickpimentel.marvelapp.util.Constants
 import retrofit2.Response
 import retrofit2.http.GET
