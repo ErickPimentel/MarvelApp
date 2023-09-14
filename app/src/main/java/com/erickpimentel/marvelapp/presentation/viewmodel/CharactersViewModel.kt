@@ -9,7 +9,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.erickpimentel.marvelapp.domain.model.Character
-import com.erickpimentel.marvelapp.domain.usecases.GetAllCharactersUseCase
+import com.erickpimentel.marvelapp.domain.usecases.GetCharactersUseCase
 import com.erickpimentel.marvelapp.presentation.adapter.CharacterAdapter
 import com.erickpimentel.marvelapp.presentation.paging.CharacterPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 @HiltViewModel
 class CharactersViewModel @Inject constructor(
-    private val getAllCharactersUseCase: GetAllCharactersUseCase
+    private val getCharactersUseCase: GetCharactersUseCase
 ) : ViewModel() {
 
     private val _currentQuery = MutableLiveData<String?>()
@@ -58,7 +58,7 @@ class CharactersViewModel @Inject constructor(
     private fun getSearchResultStream(nameStartsWith: String?): Flow<PagingData<Character>> {
         return Pager(
             config = PagingConfig(20),
-            pagingSourceFactory = { CharacterPagingSource(getAllCharactersUseCase, nameStartsWith) }
+            pagingSourceFactory = { CharacterPagingSource(getCharactersUseCase, nameStartsWith) }
         ).flow
     }
 

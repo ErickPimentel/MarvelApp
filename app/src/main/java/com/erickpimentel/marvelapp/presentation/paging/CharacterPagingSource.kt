@@ -2,11 +2,11 @@ package com.erickpimentel.marvelapp.presentation.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.erickpimentel.marvelapp.domain.usecases.GetAllCharactersUseCase
+import com.erickpimentel.marvelapp.domain.usecases.GetCharactersUseCase
 import com.erickpimentel.marvelapp.domain.model.Character
 
 class CharacterPagingSource(
-    private val getAllCharactersUseCase: GetAllCharactersUseCase,
+    private val getCharactersUseCase: GetCharactersUseCase,
     private val nameStartsWith: String?,
 ) : PagingSource<Int, Character>() {
 
@@ -16,7 +16,7 @@ class CharacterPagingSource(
 
             val offset = pageNumber * PAGE_SIZE
 
-            val response = getAllCharactersUseCase(
+            val response = getCharactersUseCase(
                 nameStartsWith = if (nameStartsWith.isNullOrEmpty()) null else nameStartsWith,
                 offset = offset,
                 limit = PAGE_SIZE
