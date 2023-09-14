@@ -3,4 +3,5 @@
     <string name="home">Home</string>
     <string name="search">Search</string>
     <string name="no_internet_connection">No internet connection</string>
+    <string name="character_background_image">Character background image</string>
 </resources>
