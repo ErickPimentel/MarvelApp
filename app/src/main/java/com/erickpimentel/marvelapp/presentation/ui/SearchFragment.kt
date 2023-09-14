@@ -19,6 +19,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -74,8 +75,10 @@ class SearchFragment : Fragment() {
             }
         }
 
-        characterAdapter.setOnItemClickListener {
+        characterAdapter.setOnItemClickListener { character ->
             charactersViewModel.addSuggestion(binding.searchView.query.toString())
+            charactersViewModel.setCurrentCharacter(character)
+            findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToCharacterDetailsFragment())
         }
 
 

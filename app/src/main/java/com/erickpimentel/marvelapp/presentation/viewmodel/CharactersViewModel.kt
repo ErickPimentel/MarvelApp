@@ -3,7 +3,6 @@ package com.erickpimentel.marvelapp.presentation.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -28,6 +27,17 @@ class CharactersViewModel @Inject constructor(
     private val _suggestionsList = arrayListOf<String>()
     val suggestionsList: ArrayList<String> = _suggestionsList
 
+    private val _currentCharacter = MutableLiveData<Character>()
+    val currentCharacter: LiveData<Character> get() = _currentCharacter
+
+    private fun insertCurrentCharacter(character: Character){
+        _currentCharacter.value = character
+    }
+
+    fun setCurrentCharacter(character: Character){
+        insertCurrentCharacter(character)
+    }
+
     private fun insertCurrentQuery(query: String?){
         _currentQuery.value = query
     }
@@ -45,7 +55,7 @@ class CharactersViewModel @Inject constructor(
     }
 
     val charactersList = getSearchResultStream(nameStartsWith = null).cachedIn(viewModelScope)
-    fun getSearchResultStream(nameStartsWith: String?): Flow<PagingData<Character>> {
+    private fun getSearchResultStream(nameStartsWith: String?): Flow<PagingData<Character>> {
         return Pager(
             config = PagingConfig(20),
             pagingSourceFactory = { CharacterPagingSource(getAllCharactersUseCase, nameStartsWith) }
