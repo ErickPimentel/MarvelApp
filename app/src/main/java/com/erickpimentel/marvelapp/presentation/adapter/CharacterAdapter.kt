@@ -35,10 +35,18 @@ class CharacterAdapter @Inject constructor(): PagingDataAdapter<Character, Chara
                 Glide.with(binding.root.context).load(imageUrl).into(characterImageView)
 
                 characterDescription.text = character.description
+
+                root.setOnClickListener {
+                    onItemClickListener?.invoke(character)
+                }
             }
         }
     }
 
+    private var onItemClickListener: ((Character) -> Unit)? = null
+    fun setOnItemClickListener(listener: (Character) -> Unit){
+        onItemClickListener = listener
+    }
 
     companion object {
         private val differCallback = object : DiffUtil.ItemCallback<Character>(){

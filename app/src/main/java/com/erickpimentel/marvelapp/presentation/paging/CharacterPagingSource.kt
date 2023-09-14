@@ -1,6 +1,5 @@
 package com.erickpimentel.marvelapp.presentation.paging
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.erickpimentel.marvelapp.domain.usecases.GetAllCharactersUseCase
@@ -18,7 +17,7 @@ class CharacterPagingSource(
             val offset = pageNumber * PAGE_SIZE
 
             val response = getAllCharactersUseCase(
-                nameStartsWith = nameStartsWith,
+                nameStartsWith = if (nameStartsWith.isNullOrEmpty()) null else nameStartsWith,
                 offset = offset,
                 limit = PAGE_SIZE
             )
@@ -26,8 +25,6 @@ class CharacterPagingSource(
             val data = response.body()?.data
 
             val characters = data?.results?.map { it.toCharacter() } ?: emptyList()
-
-            Log.d("CharactersPagingSource", "characters: $characters")
 
             val prevPage = if (pageNumber > 0) pageNumber - 1 else null
 
@@ -51,6 +48,6 @@ class CharacterPagingSource(
     }
 
     companion object {
-        const val PAGE_SIZE = 20
+        const val PAGE_SIZE = 5
     }
 }

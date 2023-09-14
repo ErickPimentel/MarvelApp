@@ -10,7 +10,7 @@ interface MarvelApiService {
 
     @GET("/v1/public/characters")
     suspend fun getAllCharacters(
-        @Query("apikey") apikey: String = Constants.API_KEY,
+        @Query("apikey") apikey: String = Constants.PUBLIC_KEY,
         @Query("ts") ts: String = Constants.timeStamp,
         @Query("hash") hash: String = Constants.hash(),
         @Query("nameStartsWith") nameStartsWith: String?,
