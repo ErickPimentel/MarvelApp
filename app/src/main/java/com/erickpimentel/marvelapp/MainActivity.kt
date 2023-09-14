@@ -2,6 +2,7 @@ package com.erickpimentel.marvelapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -27,6 +28,13 @@ class MainActivity : AppCompatActivity() {
         val appBarConfiguration = AppBarConfiguration(setOf(R.id.homeFragment, R.id.searchFragment))
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding?.bottomNavigationView?.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.characterDetailsFragment -> binding?.bottomNavigationView?.visibility = View.GONE
+                else -> binding?.bottomNavigationView?.visibility = View.VISIBLE
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
