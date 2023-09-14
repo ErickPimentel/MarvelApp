@@ -2,13 +2,11 @@ package com.erickpimentel.marvelapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.erickpimentel.marvelapp.databinding.ActivityMainBinding
-import com.erickpimentel.marvelapp.presentation.viewmodel.CharactersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

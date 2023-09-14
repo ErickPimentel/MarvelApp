@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.presentation.viewmodel
+package com.erickpimentel.marvelapp.presentation.ui.search
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 @HiltViewModel
-class CharactersViewModel @Inject constructor(
+class SearchViewModel @Inject constructor(
     private val getCharactersUseCase: GetCharactersUseCase
 ) : ViewModel() {
 
@@ -26,17 +26,6 @@ class CharactersViewModel @Inject constructor(
 
     private val _suggestionsList = arrayListOf<String>()
     val suggestionsList: ArrayList<String> = _suggestionsList
-
-    private val _currentCharacter = MutableLiveData<Character>()
-    val currentCharacter: LiveData<Character> get() = _currentCharacter
-
-    private fun insertCurrentCharacter(character: Character){
-        _currentCharacter.value = character
-    }
-
-    fun setCurrentCharacter(character: Character){
-        insertCurrentCharacter(character)
-    }
 
     private fun insertCurrentQuery(query: String?){
         _currentQuery.value = query
@@ -54,7 +43,6 @@ class CharactersViewModel @Inject constructor(
         if (!suggestionsList.contains(suggestion)) insertSuggestion(suggestion)
     }
 
-    val charactersList = getSearchResultStream(nameStartsWith = null).cachedIn(viewModelScope)
     private fun getSearchResultStream(nameStartsWith: String?): Flow<PagingData<Character>> {
         return Pager(
             config = PagingConfig(20),
