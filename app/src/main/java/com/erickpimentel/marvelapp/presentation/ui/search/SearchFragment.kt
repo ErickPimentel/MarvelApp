@@ -61,38 +61,11 @@ class SearchFragment : Fragment() {
 
         setOnSuggestionListener()
 
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                searchViewModel.charactersListSearch.collect{
-                    if (!searchViewModel.currentQuery.value.isNullOrEmpty()) characterAdapter.submitData(it)
-                }
-            }
-        }
+        setupCharactersList()
 
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                characterAdapter.loadStateFlow.collectLatest { loadState ->
-                    val state = loadState.refresh
-                    binding.recyclerView.isVisible = characterAdapter.itemCount > 0 && state !is LoadState.Error
-                    binding.noResults.isVisible = (characterAdapter.itemCount == 0 || state is LoadState.Error) && !searchViewModel.currentQuery.value.isNullOrEmpty()
+        setupLoadStateHandling()
 
-                    if (state is LoadState.Error) {
-                        when (state.error){
-                            is UnknownHostException -> {
-                                requireView().showSnackBar(R.string.no_internet_connection)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        characterAdapter.setOnItemClickListener { character ->
-            searchViewModel.addSuggestion(binding.searchView.query.toString())
-            characterDetailsViewModel.setCurrentCharacter(character)
-            findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToCharacterDetailsFragment())
-        }
-
+        setOnItemClickListener()
 
         return binding.root
     }
@@ -106,6 +79,46 @@ class SearchFragment : Fragment() {
                     characterAdapter.retry()
                 }
             )
+        }
+    }
+
+    private fun setupLoadStateHandling() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                characterAdapter.loadStateFlow.collectLatest { loadState ->
+                    val state = loadState.refresh
+                    binding.recyclerView.isVisible =
+                        characterAdapter.itemCount > 0 && state !is LoadState.Error
+                    binding.noResults.isVisible =
+                        (characterAdapter.itemCount == 0 || state is LoadState.Error) && !searchViewModel.currentQuery.value.isNullOrEmpty()
+
+                    if (state is LoadState.Error) {
+                        when (state.error) {
+                            is UnknownHostException -> {
+                                requireView().showSnackBar(R.string.no_internet_connection)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupCharactersList() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                searchViewModel.charactersListSearch.collect {
+                    if (!searchViewModel.currentQuery.value.isNullOrEmpty()) characterAdapter.submitData(it)
+                }
+            }
+        }
+    }
+
+    private fun setOnItemClickListener() {
+        characterAdapter.setOnItemClickListener { character ->
+            searchViewModel.addSuggestion(binding.searchView.query.toString())
+            characterDetailsViewModel.setCurrentCharacter(character)
+            findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToCharacterDetailsFragment())
         }
     }
 
