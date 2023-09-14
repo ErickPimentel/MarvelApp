@@ -12,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erickpimentel.marvelapp.databinding.FragmentHomeBinding
@@ -66,6 +67,11 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
+        }
+
+        characterAdapter.setOnItemClickListener { character ->
+            charactersViewModel.setCurrentCharacter(character)
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToCharacterDetailsFragment())
         }
 
     }
