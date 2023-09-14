@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.presentation.ui
+package com.erickpimentel.marvelapp.presentation.ui.characterDetails
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.erickpimentel.marvelapp.databinding.FragmentCharacterDetailsBinding
-import com.erickpimentel.marvelapp.presentation.viewmodel.CharactersViewModel
+import com.erickpimentel.marvelapp.presentation.ui.search.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -17,7 +17,7 @@ class CharacterDetailsFragment : Fragment() {
     private var _binding: FragmentCharacterDetailsBinding? = null
     private val binding get() = _binding
 
-    private val charactersViewModel: CharactersViewModel by activityViewModels()
+    private val characterDetailsViewModel: CharacterDetailsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,7 +26,7 @@ class CharacterDetailsFragment : Fragment() {
         _binding = FragmentCharacterDetailsBinding.inflate(inflater, container, false)
 
         binding?.apply {
-            charactersViewModel.currentCharacter.value?.let { character ->
+            characterDetailsViewModel.currentCharacter.value?.let { character ->
                 characterName.text = character.name
                 characterDescription.text = character.description
 

@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.presentation.ui
+package com.erickpimentel.marvelapp.presentation.ui.search
 
 import android.app.SearchManager
 import android.content.Context
@@ -27,7 +27,7 @@ import com.erickpimentel.marvelapp.R
 import com.erickpimentel.marvelapp.databinding.FragmentSearchBinding
 import com.erickpimentel.marvelapp.presentation.adapter.CharacterAdapter
 import com.erickpimentel.marvelapp.presentation.adapter.LoadMoreAdapter
-import com.erickpimentel.marvelapp.presentation.viewmodel.CharactersViewModel
+import com.erickpimentel.marvelapp.presentation.ui.characterDetails.CharacterDetailsViewModel
 import com.erickpimentel.marvelapp.util.SnackBarUtil.Companion.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -41,7 +41,8 @@ class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
-    private val charactersViewModel: CharactersViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
+    private val characterDetailsViewModel: CharacterDetailsViewModel by activityViewModels()
 
     @Inject
     lateinit var characterAdapter: CharacterAdapter
@@ -56,42 +57,15 @@ class SearchFragment : Fragment() {
 
         val cursorAdapter = setCursorAdapter()
 
-        setOnQueryTextListener(cursorAdapter, charactersViewModel.suggestionsList)
+        setOnQueryTextListener(cursorAdapter, searchViewModel.suggestionsList)
 
         setOnSuggestionListener()
 
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                charactersViewModel.charactersListSearch.collect{
-                    if (!charactersViewModel.currentQuery.value.isNullOrEmpty()) characterAdapter.submitData(it)
-                }
-            }
-        }
+        setupCharactersList()
 
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                characterAdapter.loadStateFlow.collectLatest { loadState ->
-                    val state = loadState.refresh
-                    binding.recyclerView.isVisible = characterAdapter.itemCount > 0 && state !is LoadState.Error
-                    binding.noResults.isVisible = (characterAdapter.itemCount == 0 || state is LoadState.Error) && !charactersViewModel.currentQuery.value.isNullOrEmpty()
+        setupLoadStateHandling()
 
-                    if (state is LoadState.Error) {
-                        when (state.error){
-                            is UnknownHostException -> {
-                                requireView().showSnackBar(R.string.no_internet_connection)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        characterAdapter.setOnItemClickListener { character ->
-            charactersViewModel.addSuggestion(binding.searchView.query.toString())
-            charactersViewModel.setCurrentCharacter(character)
-            findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToCharacterDetailsFragment())
-        }
-
+        setOnItemClickListener()
 
         return binding.root
     }
@@ -105,6 +79,46 @@ class SearchFragment : Fragment() {
                     characterAdapter.retry()
                 }
             )
+        }
+    }
+
+    private fun setupLoadStateHandling() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                characterAdapter.loadStateFlow.collectLatest { loadState ->
+                    val state = loadState.refresh
+                    binding.recyclerView.isVisible =
+                        characterAdapter.itemCount > 0 && state !is LoadState.Error
+                    binding.noResults.isVisible =
+                        (characterAdapter.itemCount == 0 || state is LoadState.Error) && !searchViewModel.currentQuery.value.isNullOrEmpty()
+
+                    if (state is LoadState.Error) {
+                        when (state.error) {
+                            is UnknownHostException -> {
+                                requireView().showSnackBar(R.string.no_internet_connection)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupCharactersList() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                searchViewModel.charactersListSearch.collect {
+                    if (!searchViewModel.currentQuery.value.isNullOrEmpty()) characterAdapter.submitData(it)
+                }
+            }
+        }
+    }
+
+    private fun setOnItemClickListener() {
+        characterAdapter.setOnItemClickListener { character ->
+            searchViewModel.addSuggestion(binding.searchView.query.toString())
+            characterDetailsViewModel.setCurrentCharacter(character)
+            findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToCharacterDetailsFragment())
         }
     }
 
@@ -140,15 +154,15 @@ class SearchFragment : Fragment() {
     private fun setOnQueryTextListener(cursorAdapter: SimpleCursorAdapter, suggestions: List<String>) {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query != charactersViewModel.currentQuery.value || query.isNullOrEmpty()){
+                if (query != searchViewModel.currentQuery.value || query.isNullOrEmpty()){
                     view?.hideKeyboard()
-                    charactersViewModel.updateQuery(query)
+                    searchViewModel.updateQuery(query)
 
                     lifecycleScope.launch {
                         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
 
                             if (query.isNullOrEmpty()) characterAdapter.submitData(PagingData.empty())
-                            else charactersViewModel.refreshCharactersList(characterAdapter)
+                            else searchViewModel.refreshCharactersList(characterAdapter)
 
                         }
                     }
@@ -157,8 +171,8 @@ class SearchFragment : Fragment() {
             }
 
             override fun onQueryTextChange(query: String?): Boolean {
-                if (query != charactersViewModel.currentQuery.value || query.isNullOrEmpty()){
-                    charactersViewModel.updateQuery(query)
+                if (query != searchViewModel.currentQuery.value || query.isNullOrEmpty()){
+                    searchViewModel.updateQuery(query)
 
                     lifecycleScope.launch {
                         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
@@ -166,7 +180,7 @@ class SearchFragment : Fragment() {
                             if (query.isNullOrEmpty()) characterAdapter.submitData(PagingData.empty())
                             else {
                                 populateCursorAdapterWithMatchingSuggestions(query, suggestions, cursorAdapter)
-                                charactersViewModel.refreshCharactersList(characterAdapter)
+                                searchViewModel.refreshCharactersList(characterAdapter)
                             }
 
                         }

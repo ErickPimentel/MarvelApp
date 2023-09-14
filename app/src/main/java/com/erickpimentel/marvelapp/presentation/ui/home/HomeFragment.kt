@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.presentation.ui
+package com.erickpimentel.marvelapp.presentation.ui.home
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -17,11 +17,10 @@ import com.erickpimentel.marvelapp.R
 import com.erickpimentel.marvelapp.databinding.FragmentHomeBinding
 import com.erickpimentel.marvelapp.presentation.adapter.CharacterAdapter
 import com.erickpimentel.marvelapp.presentation.adapter.LoadMoreAdapter
-import com.erickpimentel.marvelapp.presentation.viewmodel.CharactersViewModel
+import com.erickpimentel.marvelapp.presentation.ui.characterDetails.CharacterDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.erickpimentel.marvelapp.util.SnackBarUtil
 import com.erickpimentel.marvelapp.util.SnackBarUtil.Companion.showSnackBar
 import java.net.UnknownHostException
 
@@ -31,7 +30,8 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val charactersViewModel: CharactersViewModel by activityViewModels()
+    private val homeViewModel: HomeViewModel by activityViewModels()
+    private val characterDetailsViewModel: CharacterDetailsViewModel by activityViewModels()
 
     @Inject
     lateinit var characterAdapter: CharacterAdapter
@@ -47,44 +47,6 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.apply {
-
-            lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    charactersViewModel.charactersList.collect{
-                        characterAdapter.submitData(it)
-                    }
-                }
-            }
-
-            lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    characterAdapter.loadStateFlow.collect{ loadState ->
-                        val state = loadState.refresh
-                        progressBar.isVisible = state is LoadState.Loading
-
-                        if (state is LoadState.Error) {
-                            when (state.error){
-                                is UnknownHostException -> {
-                                    requireView().showSnackBar(R.string.no_internet_connection)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        characterAdapter.setOnItemClickListener { character ->
-            charactersViewModel.setCurrentCharacter(character)
-            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToCharacterDetailsFragment())
-        }
-
-    }
-
     private fun setupRecyclerView() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -94,6 +56,56 @@ class HomeFragment : Fragment() {
                     characterAdapter.retry()
                 }
             )
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.apply {
+
+            setupCharactersList()
+
+            setupLoadStateHandling()
+        }
+
+        setOnItemClickListener()
+
+    }
+
+    private fun setupCharactersList() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                homeViewModel.charactersList.collect {
+                    characterAdapter.submitData(it)
+                }
+            }
+        }
+    }
+
+    private fun FragmentHomeBinding.setupLoadStateHandling() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                characterAdapter.loadStateFlow.collect { loadState ->
+                    val state = loadState.refresh
+                    progressBar.isVisible = state is LoadState.Loading
+
+                    if (state is LoadState.Error) {
+                        when (state.error) {
+                            is UnknownHostException -> {
+                                requireView().showSnackBar(R.string.no_internet_connection)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setOnItemClickListener() {
+        characterAdapter.setOnItemClickListener { character ->
+            characterDetailsViewModel.setCurrentCharacter(character)
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToCharacterDetailsFragment())
         }
     }
 
