@@ -24,7 +24,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.erickpimentel.marvelapp.util.SnackBarUtil.Companion.showSnackBar
-import java.net.UnknownHostException
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -76,19 +75,27 @@ class HomeFragment : Fragment() {
 
         setOnItemClickListener()
 
+        setPersonErrorMessageObserver()
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            homeViewModel.refreshCharactersList(characterAdapter)
+        }
+
     }
 
     private fun FragmentHomeBinding.getFirstFiveCharacters() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            when (val apiResult = homeViewModel.getFirstFiveCharacters()) {
-                is ApiResult.Success -> {
-                    val characters = apiResult.response.body()?.data?.results?.map { it.toCharacter() } ?: emptyList()
-                    val carouselAdapter = CarouselAdapter(characters)
-                    carouselRecyclerView.adapter = carouselAdapter
-                }
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                when (val apiResult = homeViewModel.getFirstFiveCharacters()) {
+                    is ApiResult.Success -> {
+                        val characters = apiResult.response.body()?.data?.results?.map { it.toCharacter() } ?: emptyList()
+                        val carouselAdapter = CarouselAdapter(characters)
+                        carouselRecyclerView.adapter = carouselAdapter
+                    }
 
-                is ApiResult.Error -> {
-                    requireView().showSnackBar(R.string.no_internet_connection)
+                    is ApiResult.Error -> {
+                        homeViewModel.setErrorMessage(apiResult.exception.message)
+                    }
                 }
             }
         }
@@ -108,12 +115,13 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 characterAdapter.loadStateFlow.collect { loadState ->
-                    val state = loadState.refresh
-                    progressBar.isVisible = state is LoadState.Loading
 
-                    if (state is LoadState.Error) {
-                        when (state.error) {
-                            is UnknownHostException -> requireView().showSnackBar(R.string.no_internet_connection)
+                    when (val state = loadState.refresh){
+                        is LoadState.NotLoading -> swipeRefreshLayout.isRefreshing = false
+                        is LoadState.Loading -> swipeRefreshLayout.isRefreshing = true
+                        is LoadState.Error -> {
+                            swipeRefreshLayout.isRefreshing = false
+                            homeViewModel.setErrorMessage(state.error.message)
                         }
                     }
                 }
@@ -125,6 +133,14 @@ class HomeFragment : Fragment() {
         characterAdapter.setOnItemClickListener { character ->
             characterDetailsViewModel.setCurrentCharacter(character)
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToCharacterDetailsFragment())
+        }
+    }
+
+    private fun setPersonErrorMessageObserver() {
+        homeViewModel.errorMessage.observe(viewLifecycleOwner) { singleUseException ->
+            singleUseException.getContentIfNotHandled()?.let {
+                requireView().showSnackBar(R.string.no_internet_connection)
+            }
         }
     }
 
