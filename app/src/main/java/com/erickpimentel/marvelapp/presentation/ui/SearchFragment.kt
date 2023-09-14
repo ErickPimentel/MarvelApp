@@ -28,9 +28,11 @@ import com.erickpimentel.marvelapp.databinding.FragmentSearchBinding
 import com.erickpimentel.marvelapp.presentation.adapter.CharacterAdapter
 import com.erickpimentel.marvelapp.presentation.adapter.LoadMoreAdapter
 import com.erickpimentel.marvelapp.presentation.viewmodel.CharactersViewModel
+import com.erickpimentel.marvelapp.util.SnackBarUtil.Companion.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -69,8 +71,17 @@ class SearchFragment : Fragment() {
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 characterAdapter.loadStateFlow.collectLatest { loadState ->
-                    binding.recyclerView.isVisible = characterAdapter.itemCount > 0 && loadState.refresh !is LoadState.Error
-                    binding.noResults.isVisible = (characterAdapter.itemCount == 0 || loadState.refresh is LoadState.Error) && !charactersViewModel.currentQuery.value.isNullOrEmpty()
+                    val state = loadState.refresh
+                    binding.recyclerView.isVisible = characterAdapter.itemCount > 0 && state !is LoadState.Error
+                    binding.noResults.isVisible = (characterAdapter.itemCount == 0 || state is LoadState.Error) && !charactersViewModel.currentQuery.value.isNullOrEmpty()
+
+                    if (state is LoadState.Error) {
+                        when (state.error){
+                            is UnknownHostException -> {
+                                requireView().showSnackBar(R.string.no_internet_connection)
+                            }
+                        }
+                    }
                 }
             }
         }
