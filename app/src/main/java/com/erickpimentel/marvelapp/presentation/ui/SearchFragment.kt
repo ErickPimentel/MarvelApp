@@ -21,7 +21,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erickpimentel.marvelapp.R
 import com.erickpimentel.marvelapp.databinding.FragmentSearchBinding
@@ -57,6 +56,14 @@ class SearchFragment : Fragment() {
         setOnQueryTextListener(cursorAdapter, charactersViewModel.suggestionsList)
 
         setOnSuggestionListener()
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                charactersViewModel.charactersListSearch.collect{
+                    if (!charactersViewModel.currentQuery.value.isNullOrEmpty()) characterAdapter.submitData(it)
+                }
+            }
+        }
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
@@ -118,52 +125,42 @@ class SearchFragment : Fragment() {
 
     private fun setOnQueryTextListener(cursorAdapter: SimpleCursorAdapter, suggestions: List<String>) {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(p0: String?): Boolean {
-                view?.hideKeyboard()
-                charactersViewModel.updateQuery(p0)
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (query != charactersViewModel.currentQuery.value || query.isNullOrEmpty()){
+                    view?.hideKeyboard()
+                    charactersViewModel.updateQuery(query)
 
-                lifecycleScope.launch {
-                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    lifecycleScope.launch {
+                        viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
 
-                        if (p0.isNullOrEmpty()) characterAdapter.submitData(PagingData.empty())
-                        else getSearchResult()
+                            if (query.isNullOrEmpty()) characterAdapter.submitData(PagingData.empty())
+                            else charactersViewModel.refreshCharactersList(characterAdapter)
 
+                        }
                     }
                 }
                 return false
             }
 
-            override fun onQueryTextChange(p0: String?): Boolean {
-                charactersViewModel.updateQuery(p0)
+            override fun onQueryTextChange(query: String?): Boolean {
+                if (query != charactersViewModel.currentQuery.value || query.isNullOrEmpty()){
+                    charactersViewModel.updateQuery(query)
 
-                lifecycleScope.launch {
-                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    lifecycleScope.launch {
+                        viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
 
-                        if (p0.isNullOrEmpty()) characterAdapter.submitData(PagingData.empty())
-                         else {
-                            populateCursorAdapterWithMatchingSuggestions(p0, suggestions, cursorAdapter)
-                            getSearchResult()
+                            if (query.isNullOrEmpty()) characterAdapter.submitData(PagingData.empty())
+                            else {
+                                populateCursorAdapterWithMatchingSuggestions(query, suggestions, cursorAdapter)
+                                charactersViewModel.refreshCharactersList(characterAdapter)
+                            }
+
                         }
-
                     }
                 }
                 return false
             }
         })
-    }
-
-    private fun getSearchResult(){
-
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                val charactersList = charactersViewModel.getSearchResultStream(
-                    nameStartsWith = charactersViewModel.currentQuery.value
-                ).cachedIn(lifecycleScope)
-                charactersList.collect{
-                    characterAdapter.submitData(it)
-                }
-            }
-        }
     }
 
     private fun populateCursorAdapterWithMatchingSuggestions(newText: String?, suggestions: List<String>, cursorAdapter: SimpleCursorAdapter) {

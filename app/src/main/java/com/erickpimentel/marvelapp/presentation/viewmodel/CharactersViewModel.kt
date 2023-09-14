@@ -3,6 +3,7 @@ package com.erickpimentel.marvelapp.presentation.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -10,9 +11,11 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.erickpimentel.marvelapp.domain.model.Character
 import com.erickpimentel.marvelapp.domain.usecases.GetAllCharactersUseCase
+import com.erickpimentel.marvelapp.presentation.adapter.CharacterAdapter
 import com.erickpimentel.marvelapp.presentation.paging.CharacterPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 @HiltViewModel
 class CharactersViewModel @Inject constructor(
@@ -47,5 +50,17 @@ class CharactersViewModel @Inject constructor(
             config = PagingConfig(20),
             pagingSourceFactory = { CharacterPagingSource(getAllCharactersUseCase, nameStartsWith) }
         ).flow
+    }
+
+    var charactersListSearch = getSearchResultStream(nameStartsWith = currentQuery.value).cachedIn(viewModelScope)
+    fun refreshCharactersList(characterAdapter: CharacterAdapter){
+        viewModelScope.launch {
+            charactersListSearch = getSearchResultStream(
+                nameStartsWith = currentQuery.value
+            ).cachedIn(viewModelScope)
+            charactersListSearch.collect{
+                characterAdapter.submitData(it)
+            }
+        }
     }
 }
