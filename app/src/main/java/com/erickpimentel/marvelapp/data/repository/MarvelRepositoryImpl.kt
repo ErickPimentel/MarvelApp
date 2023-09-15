@@ -2,6 +2,7 @@ package com.erickpimentel.marvelapp.data.repository
 
 import com.erickpimentel.marvelapp.data.api.MarvelApiService
 import com.erickpimentel.marvelapp.data.dto.CharactersDTO
+import com.erickpimentel.marvelapp.data.network.ApiResult
 import com.erickpimentel.marvelapp.domain.repository.MarvelRepository
 import retrofit2.Response
 import javax.inject.Inject

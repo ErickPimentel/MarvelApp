@@ -3,6 +3,7 @@ package com.erickpimentel.marvelapp.presentation.paging
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.erickpimentel.marvelapp.data.network.ApiResult
 import com.erickpimentel.marvelapp.domain.usecases.GetCharactersUseCase
 import com.erickpimentel.marvelapp.domain.model.Character
 

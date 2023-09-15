@@ -14,6 +14,12 @@ class SnackBarUtil {
             snackBar.view.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
             snackBar.show()
         }
+
+        fun View.showSnackBar(string: String, length: Int = Snackbar.LENGTH_LONG) {
+            val snackBar = Snackbar.make(this, string, length)
+            snackBar.view.setBackgroundColor(ContextCompat.getColor(context, R.color.red))
+            snackBar.show()
+        }
     }
 
 }

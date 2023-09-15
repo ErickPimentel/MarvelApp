@@ -90,4 +90,10 @@ dependencies {
     //OkHttp3
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
 
+    //Carousel Recyclerview
+    implementation 'com.github.sparrow007:carouselrecyclerview:1.2.4'
+
+    //Swipe Refresh Layout
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
 }
