@@ -4,7 +4,8 @@ import android.util.Log
 import com.erickpimentel.marvelapp.data.api.MarvelApiService
 import com.erickpimentel.marvelapp.data.repository.MarvelRepositoryImpl
 import com.erickpimentel.marvelapp.data.repository.MarvelRepository
-import com.erickpimentel.marvelapp.util.Constants
+import com.erickpimentel.marvelapp.data.network.AuthInterceptor
+import com.erickpimentel.marvelapp.data.network.AuthInterceptor.Companion.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,24 +22,31 @@ object ApiModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideBaseUrl(): String = BASE_URL
+
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(): AuthInterceptor = AuthInterceptor()
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
         val httpClientBuilder = OkHttpClient.Builder()
 
-        val loggingInterceptor = HttpLoggingInterceptor { message ->
-            Log.d("OkHttp", message)
-        }
+        val loggingInterceptor = HttpLoggingInterceptor { message -> Log.d("OkHttp", message) }
         loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
         httpClientBuilder.addInterceptor(loggingInterceptor)
 
+        httpClientBuilder.addInterceptor(authInterceptor)
 
         return httpClientBuilder.build()
     }
 
     @Provides
     @Singleton
-    fun provideRetrofit(client: OkHttpClient): Retrofit =
+    fun provideRetrofit(baseUrl: String, client: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
+            .baseUrl(baseUrl)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
