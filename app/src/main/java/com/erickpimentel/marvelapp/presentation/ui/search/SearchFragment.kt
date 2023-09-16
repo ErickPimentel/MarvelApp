@@ -20,6 +20,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,6 +36,7 @@ import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 import javax.inject.Inject
 
+@ExperimentalPagingApi
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
 

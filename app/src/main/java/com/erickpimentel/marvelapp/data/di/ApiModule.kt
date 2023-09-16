@@ -1,14 +1,18 @@
 package com.erickpimentel.marvelapp.data.di
 
+import android.content.Context
 import android.util.Log
-import com.erickpimentel.marvelapp.data.api.MarvelApiService
-import com.erickpimentel.marvelapp.data.repository.MarvelRepositoryImpl
-import com.erickpimentel.marvelapp.data.repository.MarvelRepository
-import com.erickpimentel.marvelapp.data.network.AuthInterceptor
-import com.erickpimentel.marvelapp.data.network.AuthInterceptor.Companion.BASE_URL
+import androidx.room.Room
+import com.erickpimentel.marvelapp.data.local.database.CharacterDataBase
+import com.erickpimentel.marvelapp.data.remote.api.CharacterApiService
+import com.erickpimentel.marvelapp.data.remote.repository.MarvelRepositoryImpl
+import com.erickpimentel.marvelapp.data.remote.repository.MarvelRepository
+import com.erickpimentel.marvelapp.data.remote.network.AuthInterceptor
+import com.erickpimentel.marvelapp.data.remote.network.AuthInterceptor.Companion.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -53,12 +57,12 @@ object ApiModule {
 
     @Provides
     @Singleton
-    fun provideMarvelApiService(retrofit: Retrofit): MarvelApiService =
-        retrofit.create(MarvelApiService::class.java)
+    fun provideMarvelApiService(retrofit: Retrofit): CharacterApiService =
+        retrofit.create(CharacterApiService::class.java)
 
     @Provides
     @Singleton
-    fun provideMarvelRepository(marvelApiService: MarvelApiService): MarvelRepository {
-        return MarvelRepositoryImpl(marvelApiService)
+    fun provideMarvelRepository(characterApiService: CharacterApiService): MarvelRepository {
+        return MarvelRepositoryImpl(characterApiService)
     }
 }

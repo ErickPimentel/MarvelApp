@@ -11,10 +11,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erickpimentel.marvelapp.R
-import com.erickpimentel.marvelapp.data.network.ApiResult
+import com.erickpimentel.marvelapp.data.remote.network.ApiResult
 import com.erickpimentel.marvelapp.databinding.FragmentHomeBinding
 import com.erickpimentel.marvelapp.presentation.ui.adapter.CarouselAdapter
 import com.erickpimentel.marvelapp.presentation.ui.adapter.CharacterAdapter
@@ -26,6 +27,7 @@ import javax.inject.Inject
 import com.erickpimentel.marvelapp.util.SnackBarUtil.Companion.showSnackBar
 
 @AndroidEntryPoint
+@ExperimentalPagingApi
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -51,12 +53,14 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerView() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
+            adapter = characterAdapter
 
-            adapter = characterAdapter.withLoadStateFooter(
-                LoadMoreAdapter{
-                    characterAdapter.retry()
-                }
-            )
+//            adapter = characterAdapter.withLoadStateFooter(
+//                LoadMoreAdapter{
+//                    characterAdapter.retry()
+//                }
+//            )
         }
     }
 
@@ -67,19 +71,26 @@ class HomeFragment : Fragment() {
 
             getFirstFiveCharacters()
 
-            setupCharactersList()
+            //setupCharactersList()
 
-            setupLoadStateHandling()
+            homeViewModel.charactersList.observe(viewLifecycleOwner) {
+                characterAdapter.submitData(lifecycle, it)
+            }
+
+            //setupLoadStateHandling()
 
         }
 
-        setOnItemClickListener()
+//        setOnItemClickListener()
+//
+//        setPersonErrorMessageObserver()
+//
+//        binding.swipeRefreshLayout.setOnRefreshListener {
+//            //homeViewModel.refreshCharactersList(characterAdapter)
+//        }
 
-        setPersonErrorMessageObserver()
 
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            homeViewModel.refreshCharactersList(characterAdapter)
-        }
+
 
     }
 
@@ -88,7 +99,7 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 when (val apiResult = homeViewModel.getFirstFiveCharacters()) {
                     is ApiResult.Success -> {
-                        val characters = apiResult.response.body()?.data?.results?.map { it.toCharacter() } ?: emptyList()
+                        val characters = apiResult.response.data.results.map { it.toCharacter() } ?: emptyList()
                         val carouselAdapter = CarouselAdapter(characters)
                         carouselRecyclerView.adapter = carouselAdapter
                     }
@@ -101,48 +112,48 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setupCharactersList() {
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                homeViewModel.charactersList.collect {
-                    characterAdapter.submitData(it)
-                }
-            }
-        }
-    }
+//    private fun setupCharactersList() {
+//        lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+//                homeViewModel.charactersList.collect {
+//                    characterAdapter.submitData(it)
+//                }
+//            }
+//        }
+//    }
 
-    private fun FragmentHomeBinding.setupLoadStateHandling() {
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                characterAdapter.loadStateFlow.collect { loadState ->
+//    private fun FragmentHomeBinding.setupLoadStateHandling() {
+//        lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+//                characterAdapter.loadStateFlow.collect { loadState ->
+//
+//                    when (val state = loadState.refresh){
+//                        is LoadState.NotLoading -> swipeRefreshLayout.isRefreshing = false
+//                        is LoadState.Loading -> swipeRefreshLayout.isRefreshing = true
+//                        is LoadState.Error -> {
+//                            swipeRefreshLayout.isRefreshing = false
+//                            homeViewModel.setErrorMessage(state.error.message)
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-                    when (val state = loadState.refresh){
-                        is LoadState.NotLoading -> swipeRefreshLayout.isRefreshing = false
-                        is LoadState.Loading -> swipeRefreshLayout.isRefreshing = true
-                        is LoadState.Error -> {
-                            swipeRefreshLayout.isRefreshing = false
-                            homeViewModel.setErrorMessage(state.error.message)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun setOnItemClickListener() {
-        characterAdapter.setOnItemClickListener { character ->
-            characterDetailsViewModel.setCurrentCharacter(character)
-            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToCharacterDetailsFragment())
-        }
-    }
-
-    private fun setPersonErrorMessageObserver() {
-        homeViewModel.errorMessage.observe(viewLifecycleOwner) { singleUseException ->
-            singleUseException.getContentIfNotHandled()?.let {
-                requireView().showSnackBar(R.string.no_internet_connection)
-            }
-        }
-    }
+//    private fun setOnItemClickListener() {
+//        characterAdapter.setOnItemClickListener { character ->
+//            characterDetailsViewModel.setCurrentCharacter(character)
+//            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToCharacterDetailsFragment())
+//        }
+//    }
+//
+//    private fun setPersonErrorMessageObserver() {
+//        homeViewModel.errorMessage.observe(viewLifecycleOwner) { singleUseException ->
+//            singleUseException.getContentIfNotHandled()?.let {
+//                requireView().showSnackBar(R.string.no_internet_connection)
+//            }
+//        }
+//    }
 
     override fun onDestroyView() {
         super.onDestroyView()

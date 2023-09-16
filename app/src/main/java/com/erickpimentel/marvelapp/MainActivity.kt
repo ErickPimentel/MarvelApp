@@ -7,9 +7,11 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.paging.ExperimentalPagingApi
 import com.erickpimentel.marvelapp.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
+@ExperimentalPagingApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 

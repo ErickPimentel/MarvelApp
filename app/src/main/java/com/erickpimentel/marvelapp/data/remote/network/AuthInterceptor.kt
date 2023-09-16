@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.data.network
+package com.erickpimentel.marvelapp.data.remote.network
 
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -14,8 +14,8 @@ class AuthInterceptor : Interceptor {
         private const val TS_PARAM = "&ts="
 
         const val BASE_URL = "https://gateway.marvel.com"
-        private const val PUBLIC_KEY = ""
-        private const val PRIVATE_KEY = ""
+        private const val PUBLIC_KEY = "ca64adc2c62c2c6c95f5f5cba57b5500"
+        private const val PRIVATE_KEY = "f00c832c74c276a27d9462d1e5c50c0a7dc39e9c"
         private val timeStamp = Timestamp(System.currentTimeMillis()).time.toString()
     }
 

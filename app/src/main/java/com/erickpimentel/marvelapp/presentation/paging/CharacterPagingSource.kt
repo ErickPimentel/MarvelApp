@@ -3,7 +3,7 @@ package com.erickpimentel.marvelapp.presentation.paging
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.erickpimentel.marvelapp.data.network.ApiResult
+import com.erickpimentel.marvelapp.data.remote.network.ApiResult
 import com.erickpimentel.marvelapp.domain.usecases.GetCharactersUseCase
 import com.erickpimentel.marvelapp.domain.model.Character
 
@@ -24,13 +24,13 @@ class CharacterPagingSource(
                 limit = PAGE_SIZE
             )
 
-            val data = response.body()?.data
+            val data = response.data
 
-            val characters = data?.results?.map { it.toCharacter() } ?: emptyList()
+            val characters = data.results.map { it.toCharacter() } ?: emptyList()
 
             val prevPage = if (pageNumber > 0) pageNumber - 1 else null
 
-            val nextPage = if (data?.count!! < PAGE_SIZE) null else pageNumber + 1
+            val nextPage = if (data.count < PAGE_SIZE) null else pageNumber + 1
 
             LoadResult.Page(
                 data = characters,
