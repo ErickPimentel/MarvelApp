@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.presentation.adapter
+package com.erickpimentel.marvelapp.presentation.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -20,11 +20,11 @@ class CarouselAdapter (private val charactersList: List<Character>) : RecyclerVi
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselAdapter.CarouselViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselViewHolder {
         return CarouselViewHolder(CarouselItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: CarouselAdapter.CarouselViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
         val currentCharacter = charactersList[position]
         holder.bind(currentCharacter)
     }

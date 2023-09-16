@@ -25,8 +25,8 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erickpimentel.marvelapp.R
 import com.erickpimentel.marvelapp.databinding.FragmentSearchBinding
-import com.erickpimentel.marvelapp.presentation.adapter.CharacterAdapter
-import com.erickpimentel.marvelapp.presentation.adapter.LoadMoreAdapter
+import com.erickpimentel.marvelapp.presentation.ui.adapter.CharacterAdapter
+import com.erickpimentel.marvelapp.presentation.ui.adapter.LoadMoreAdapter
 import com.erickpimentel.marvelapp.presentation.ui.characterDetails.CharacterDetailsViewModel
 import com.erickpimentel.marvelapp.util.SnackBarUtil.Companion.showSnackBar
 import dagger.hilt.android.AndroidEntryPoint

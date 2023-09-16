@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.presentation.adapter
+package com.erickpimentel.marvelapp.presentation.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,13 +11,15 @@ import com.erickpimentel.marvelapp.domain.model.Character
 import javax.inject.Inject
 
 
-class CharacterAdapter @Inject constructor(): PagingDataAdapter<Character, CharacterAdapter.CharacterViewHolder>(differCallback)  {
+class CharacterAdapter @Inject constructor(): PagingDataAdapter<Character, CharacterAdapter.CharacterViewHolder>(
+    differCallback
+)  {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CharacterAdapter.CharacterViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CharacterViewHolder {
         return CharacterViewHolder(CharacterViewBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: CharacterAdapter.CharacterViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CharacterViewHolder, position: Int) {
         val currentCharacter = getItem(position)
 
         if (currentCharacter != null){

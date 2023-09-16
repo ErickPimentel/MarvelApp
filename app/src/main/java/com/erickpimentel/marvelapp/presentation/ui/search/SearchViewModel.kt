@@ -10,7 +10,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.erickpimentel.marvelapp.domain.model.Character
 import com.erickpimentel.marvelapp.domain.usecases.GetCharactersUseCase
-import com.erickpimentel.marvelapp.presentation.adapter.CharacterAdapter
+import com.erickpimentel.marvelapp.presentation.ui.adapter.CharacterAdapter
 import com.erickpimentel.marvelapp.presentation.paging.CharacterPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow

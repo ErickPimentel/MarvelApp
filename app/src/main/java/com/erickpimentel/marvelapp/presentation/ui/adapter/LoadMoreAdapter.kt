@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.presentation.adapter
+package com.erickpimentel.marvelapp.presentation.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,11 +10,11 @@ import com.erickpimentel.marvelapp.databinding.LoadMoreBinding
 
 class LoadMoreAdapter(private val retry: () -> Unit): LoadStateAdapter<LoadMoreAdapter.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, loadState: LoadState): LoadMoreAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, loadState: LoadState): ViewHolder {
         return ViewHolder(LoadMoreBinding.inflate(LayoutInflater.from(parent.context), parent, false), retry)
     }
 
-    override fun onBindViewHolder(holder: LoadMoreAdapter.ViewHolder, loadState: LoadState) {
+    override fun onBindViewHolder(holder: ViewHolder, loadState: LoadState) {
         holder.bind(loadState)
     }
 

@@ -13,7 +13,7 @@ import com.erickpimentel.marvelapp.data.network.ApiResult
 import com.erickpimentel.marvelapp.domain.model.Character
 import com.erickpimentel.marvelapp.domain.usecases.GetCharactersUseCase
 import com.erickpimentel.marvelapp.domain.usecases.GetFirstFiveCharactersUseCase
-import com.erickpimentel.marvelapp.presentation.adapter.CharacterAdapter
+import com.erickpimentel.marvelapp.presentation.ui.adapter.CharacterAdapter
 import com.erickpimentel.marvelapp.presentation.paging.CharacterPagingSource
 import com.erickpimentel.marvelapp.util.SingleUseException
 import dagger.hilt.android.lifecycle.HiltViewModel
