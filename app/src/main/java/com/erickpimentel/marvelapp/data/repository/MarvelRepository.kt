@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.domain.repository
+package com.erickpimentel.marvelapp.data.repository
 
 import com.erickpimentel.marvelapp.data.dto.CharactersDTO
 import com.erickpimentel.marvelapp.data.network.ApiResult

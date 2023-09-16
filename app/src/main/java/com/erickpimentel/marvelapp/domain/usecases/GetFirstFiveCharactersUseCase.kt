@@ -2,7 +2,7 @@ package com.erickpimentel.marvelapp.domain.usecases
 
 import com.erickpimentel.marvelapp.data.dto.CharactersDTO
 import com.erickpimentel.marvelapp.data.network.ApiResult
-import com.erickpimentel.marvelapp.domain.repository.MarvelRepository
+import com.erickpimentel.marvelapp.data.repository.MarvelRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response

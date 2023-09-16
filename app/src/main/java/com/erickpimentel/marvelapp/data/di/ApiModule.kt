@@ -3,7 +3,7 @@ package com.erickpimentel.marvelapp.data.di
 import android.util.Log
 import com.erickpimentel.marvelapp.data.api.MarvelApiService
 import com.erickpimentel.marvelapp.data.repository.MarvelRepositoryImpl
-import com.erickpimentel.marvelapp.domain.repository.MarvelRepository
+import com.erickpimentel.marvelapp.data.repository.MarvelRepository
 import com.erickpimentel.marvelapp.util.Constants
 import dagger.Module
 import dagger.Provides
