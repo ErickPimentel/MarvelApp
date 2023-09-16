@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -67,47 +66,37 @@ class HomeFragment : Fragment() {
 
             getFirstFiveCharacters()
 
-            setupCharactersList()
+            setupCharactersListObserver()
 
             setupLoadStateHandling()
 
+            setOnRefreshListener()
+
+            setOnItemClickListener()
+
+            setCharacterErrorMessageObserver()
+
         }
 
-        setOnItemClickListener()
+    }
 
-        setPersonErrorMessageObserver()
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            homeViewModel.refreshCharactersList(characterAdapter)
+    private fun FragmentHomeBinding.setOnRefreshListener() {
+        swipeRefreshLayout.setOnRefreshListener {
+            homeViewModel.refreshCharactersList()
+            setupCharactersListObserver()
+            homeViewModel.fetchFirstFiveCharacters()
         }
-
     }
 
     private fun FragmentHomeBinding.getFirstFiveCharacters() {
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                when (val apiResult = homeViewModel.getFirstFiveCharacters()) {
-                    is ApiResult.Success -> {
-                        val characters = apiResult.response.body()?.data?.results?.map { it.toCharacter() } ?: emptyList()
-                        val carouselAdapter = CarouselAdapter(characters)
-                        carouselRecyclerView.adapter = carouselAdapter
-                    }
-
-                    is ApiResult.Error -> {
-                        homeViewModel.setErrorMessage(apiResult.exception.message)
-                    }
-                }
-            }
+        homeViewModel.firstFiveCharactersList.observe(viewLifecycleOwner) { characters ->
+            carouselRecyclerView.adapter = CarouselAdapter(characters)
         }
     }
 
-    private fun setupCharactersList() {
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                homeViewModel.charactersList.collect {
-                    characterAdapter.submitData(it)
-                }
-            }
+    private fun setupCharactersListObserver() {
+        homeViewModel.charactersList.observe(viewLifecycleOwner) {
+            characterAdapter.submitData(lifecycle, it)
         }
     }
 
@@ -136,7 +125,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setPersonErrorMessageObserver() {
+    private fun setCharacterErrorMessageObserver() {
         homeViewModel.errorMessage.observe(viewLifecycleOwner) { singleUseException ->
             singleUseException.getContentIfNotHandled()?.let {
                 requireView().showSnackBar(R.string.no_internet_connection)

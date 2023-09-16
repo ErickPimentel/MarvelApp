@@ -8,19 +8,17 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.liveData
 import com.erickpimentel.marvelapp.data.dto.CharactersDTO
 import com.erickpimentel.marvelapp.data.network.ApiResult
 import com.erickpimentel.marvelapp.domain.model.Character
 import com.erickpimentel.marvelapp.domain.usecases.GetCharactersUseCase
 import com.erickpimentel.marvelapp.domain.usecases.GetFirstFiveCharactersUseCase
-import com.erickpimentel.marvelapp.presentation.ui.adapter.CharacterAdapter
 import com.erickpimentel.marvelapp.presentation.paging.CharacterPagingSource
 import com.erickpimentel.marvelapp.util.SingleUseException
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import retrofit2.Response
-import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,27 +27,45 @@ class HomeViewModel @Inject constructor(
     private val getFirstFiveCharactersUseCase: GetFirstFiveCharactersUseCase
 ) : ViewModel() {
 
+    init {
+        fetchFirstFiveCharacters()
+    }
+
     private val _errorMessage = MutableLiveData<SingleUseException<String>>()
     val errorMessage: LiveData<SingleUseException<String>> get() = _errorMessage
 
-    var charactersList = getSearchResultStream().cachedIn(viewModelScope)
-    private fun getSearchResultStream(): Flow<PagingData<Character>> {
+    private var _charactersList = getCharactersPagingLiveData().cachedIn(viewModelScope)
+    val charactersList get() = _charactersList
+
+    private fun getCharactersPagingLiveData(): LiveData<PagingData<Character>> {
         return Pager(
             config = PagingConfig(20),
             pagingSourceFactory = { CharacterPagingSource(getCharactersUseCase, null) }
-        ).flow
+        ).liveData
     }
-    fun refreshCharactersList(characterAdapter: CharacterAdapter){
+
+    fun refreshCharactersList(){
         viewModelScope.launch {
-            charactersList = getSearchResultStream().cachedIn(viewModelScope)
-            charactersList.collect{
-                characterAdapter.submitData(it)
-            }
+            _charactersList = getCharactersPagingLiveData().cachedIn(viewModelScope)
         }
     }
 
-    suspend fun getFirstFiveCharacters(): ApiResult<Response<CharactersDTO>> {
-        return getFirstFiveCharactersUseCase.invoke()
+    private var _firstFiveCharactersList: MutableLiveData<List<Character>> = MutableLiveData(emptyList())
+    val firstFiveCharactersList get() = _firstFiveCharactersList
+
+    fun fetchFirstFiveCharacters() {
+        viewModelScope.launch {
+            when (val apiResult = getFirstFiveCharactersUseCase.invoke()) {
+                is ApiResult.Success -> {
+                    val characters = apiResult.response.body()?.data?.results?.map { it.toCharacter() } ?: emptyList()
+                    _firstFiveCharactersList.value = characters
+                }
+
+                is ApiResult.Error -> {
+                    setErrorMessage(apiResult.exception.message)
+                }
+            }
+        }
     }
 
     fun setErrorMessage(errorMessage: String?){
