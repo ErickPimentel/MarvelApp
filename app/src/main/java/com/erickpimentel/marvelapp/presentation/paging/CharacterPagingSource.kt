@@ -38,7 +38,6 @@ class CharacterPagingSource(
                 nextKey = nextPage
             )
         } catch (e: Exception) {
-            Log.d("CharacterPagingSource", "load - $e")
             LoadResult.Error(e)
         }
     }

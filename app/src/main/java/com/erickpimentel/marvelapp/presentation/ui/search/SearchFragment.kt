@@ -61,13 +61,18 @@ class SearchFragment : Fragment() {
 
         setOnSuggestionListener()
 
-        setupCharactersList()
-
         setupLoadStateHandling()
 
         setOnItemClickListener()
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupCharactersListObserver()
+
     }
 
     private fun setupRecyclerView() {
@@ -104,11 +109,11 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun setupCharactersList() {
+    private fun setupCharactersListObserver() {
         lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                searchViewModel.charactersListSearch.collect {
-                    if (!searchViewModel.currentQuery.value.isNullOrEmpty()) characterAdapter.submitData(it)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                searchViewModel.charactersList.observe(viewLifecycleOwner) { characters ->
+                    if (!searchViewModel.currentQuery.value.isNullOrEmpty()) characterAdapter.submitData(lifecycle, characters)
                 }
             }
         }
@@ -162,7 +167,7 @@ class SearchFragment : Fragment() {
                         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
 
                             if (query.isNullOrEmpty()) characterAdapter.submitData(PagingData.empty())
-                            else searchViewModel.refreshCharactersList(characterAdapter)
+                            else refreshCharactersList()
 
                         }
                     }
@@ -180,7 +185,7 @@ class SearchFragment : Fragment() {
                             if (query.isNullOrEmpty()) characterAdapter.submitData(PagingData.empty())
                             else {
                                 populateCursorAdapterWithMatchingSuggestions(query, suggestions, cursorAdapter)
-                                searchViewModel.refreshCharactersList(characterAdapter)
+                                refreshCharactersList()
                             }
 
                         }
@@ -189,6 +194,11 @@ class SearchFragment : Fragment() {
                 return false
             }
         })
+    }
+
+    private fun refreshCharactersList() {
+        searchViewModel.refreshCharactersList()
+        setupCharactersListObserver()
     }
 
     private fun populateCursorAdapterWithMatchingSuggestions(newText: String?, suggestions: List<String>, cursorAdapter: SimpleCursorAdapter) {

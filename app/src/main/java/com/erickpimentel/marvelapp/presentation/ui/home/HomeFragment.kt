@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erickpimentel.marvelapp.R
-import com.erickpimentel.marvelapp.data.network.ApiResult
 import com.erickpimentel.marvelapp.databinding.FragmentHomeBinding
 import com.erickpimentel.marvelapp.presentation.ui.adapter.CarouselAdapter
 import com.erickpimentel.marvelapp.presentation.ui.adapter.CharacterAdapter

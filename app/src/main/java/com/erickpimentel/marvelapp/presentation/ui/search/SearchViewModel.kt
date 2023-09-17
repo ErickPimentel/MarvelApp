@@ -8,6 +8,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.liveData
 import com.erickpimentel.marvelapp.domain.model.Character
 import com.erickpimentel.marvelapp.domain.usecases.GetCharactersUseCase
 import com.erickpimentel.marvelapp.presentation.ui.adapter.CharacterAdapter
@@ -43,22 +44,22 @@ class SearchViewModel @Inject constructor(
         if (!suggestionsList.contains(suggestion)) insertSuggestion(suggestion)
     }
 
-    private fun getSearchResultStream(nameStartsWith: String?): Flow<PagingData<Character>> {
+    private var _charactersList = getCharactersPagingLiveData().cachedIn(viewModelScope)
+    val charactersList get() = _charactersList
+
+    private fun getCharactersPagingLiveData(): LiveData<PagingData<Character>> {
         return Pager(
             config = PagingConfig(20),
-            pagingSourceFactory = { CharacterPagingSource(getCharactersUseCase, nameStartsWith) }
-        ).flow
+            pagingSourceFactory = { CharacterPagingSource(
+                getCharactersUseCase = getCharactersUseCase,
+                nameStartsWith = currentQuery.value)
+            }
+        ).liveData
     }
 
-    var charactersListSearch = getSearchResultStream(nameStartsWith = currentQuery.value).cachedIn(viewModelScope)
-    fun refreshCharactersList(characterAdapter: CharacterAdapter){
+    fun refreshCharactersList(){
         viewModelScope.launch {
-            charactersListSearch = getSearchResultStream(
-                nameStartsWith = currentQuery.value
-            ).cachedIn(viewModelScope)
-            charactersListSearch.collect{
-                characterAdapter.submitData(it)
-            }
+            _charactersList = getCharactersPagingLiveData().cachedIn(viewModelScope)
         }
     }
 }
