@@ -13,11 +13,8 @@ class MarvelApplication : Application(){
     override fun onCreate() {
         super.onCreate()
 
-        // Initialize Glide with custom options if needed
         val requestOptions = RequestOptions()
-            .diskCacheStrategy(DiskCacheStrategy.ALL) // You can customize caching strategy as per your needs
-//            .placeholder(R.drawable.placeholder_image) // Placeholder image resource
-//            .error(R.drawable.error_image) // Error image resource
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
 
         Glide.init(this, GlideBuilder().setDefaultRequestOptions(requestOptions))
     }

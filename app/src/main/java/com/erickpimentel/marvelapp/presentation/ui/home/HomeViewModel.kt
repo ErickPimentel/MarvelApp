@@ -9,7 +9,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.erickpimentel.marvelapp.data.dto.CharactersDTO
 import com.erickpimentel.marvelapp.data.network.ApiResult
 import com.erickpimentel.marvelapp.domain.model.Character
 import com.erickpimentel.marvelapp.domain.usecases.GetCharactersUseCase
@@ -18,7 +17,6 @@ import com.erickpimentel.marvelapp.presentation.paging.CharacterPagingSource
 import com.erickpimentel.marvelapp.util.SingleUseException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel

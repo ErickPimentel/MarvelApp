@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.erickpimentel.marvelapp.databinding.FragmentCharacterDetailsBinding
-import com.erickpimentel.marvelapp.presentation.ui.search.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
