@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.data.network
+package com.erickpimentel.marvelapp.data.remote.network
 
 import okhttp3.Interceptor
 import okhttp3.Response

@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.data.dto
+package com.erickpimentel.marvelapp.data.remote.dto
 
 data class Stories(
     val available: Int,

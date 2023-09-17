@@ -4,13 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.erickpimentel.marvelapp.data.dto.CharactersDTO
-import com.erickpimentel.marvelapp.data.network.ApiResult
+import com.erickpimentel.marvelapp.data.remote.network.ApiResult
+import com.erickpimentel.marvelapp.data.remote.repository.CharacterRepository
 import com.erickpimentel.marvelapp.domain.model.Character
 import com.erickpimentel.marvelapp.domain.usecases.GetCharactersUseCase
 import com.erickpimentel.marvelapp.domain.usecases.GetFirstFiveCharactersUseCase
@@ -18,13 +19,14 @@ import com.erickpimentel.marvelapp.presentation.paging.CharacterPagingSource
 import com.erickpimentel.marvelapp.util.SingleUseException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import retrofit2.Response
 import javax.inject.Inject
 
+@ExperimentalPagingApi
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getCharactersUseCase: GetCharactersUseCase,
-    private val getFirstFiveCharactersUseCase: GetFirstFiveCharactersUseCase
+    private val getFirstFiveCharactersUseCase: GetFirstFiveCharactersUseCase,
+    private val charactersRepository: CharacterRepository
 ) : ViewModel() {
 
     init {
@@ -34,21 +36,23 @@ class HomeViewModel @Inject constructor(
     private val _errorMessage = MutableLiveData<SingleUseException<String>>()
     val errorMessage: LiveData<SingleUseException<String>> get() = _errorMessage
 
-    private var _charactersList = getCharactersPagingLiveData().cachedIn(viewModelScope)
-    val charactersList get() = _charactersList
+    val charactersList = charactersRepository.getCharacters().cachedIn(viewModelScope)
 
-    private fun getCharactersPagingLiveData(): LiveData<PagingData<Character>> {
-        return Pager(
-            config = PagingConfig(20),
-            pagingSourceFactory = { CharacterPagingSource(getCharactersUseCase, null) }
-        ).liveData
-    }
-
-    fun refreshCharactersList(){
-        viewModelScope.launch {
-            _charactersList = getCharactersPagingLiveData().cachedIn(viewModelScope)
-        }
-    }
+//    private var _charactersList = getCharactersPagingLiveData().cachedIn(viewModelScope)
+//    val charactersList get() = _charactersList
+//
+//    private fun getCharactersPagingLiveData(): LiveData<PagingData<Character>> {
+//        return Pager(
+//            config = PagingConfig(20),
+//            pagingSourceFactory = { CharacterPagingSource(getCharactersUseCase, null) }
+//        ).liveData
+//    }
+//
+//    fun refreshCharactersList(){
+//        viewModelScope.launch {
+//            _charactersList = getCharactersPagingLiveData().cachedIn(viewModelScope)
+//        }
+//    }
 
     private var _firstFiveCharactersList: MutableLiveData<List<Character>> = MutableLiveData(emptyList())
     val firstFiveCharactersList get() = _firstFiveCharactersList
@@ -57,7 +61,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             when (val apiResult = getFirstFiveCharactersUseCase.invoke()) {
                 is ApiResult.Success -> {
-                    val characters = apiResult.response.body()?.data?.results?.map { it.toCharacter() } ?: emptyList()
+                    val characters = apiResult.response.data.results.map { it.toCharacter() } ?: emptyList()
                     _firstFiveCharactersList.value = characters
                 }
 

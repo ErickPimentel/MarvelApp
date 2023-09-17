@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erickpimentel.marvelapp.R
@@ -24,6 +25,7 @@ import javax.inject.Inject
 import com.erickpimentel.marvelapp.util.SnackBarUtil.Companion.showSnackBar
 
 @AndroidEntryPoint
+@ExperimentalPagingApi
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -69,23 +71,27 @@ class HomeFragment : Fragment() {
 
             setupLoadStateHandling()
 
-            setOnRefreshListener()
+            //setOnRefreshListener()
 
             setOnItemClickListener()
 
             setCharacterErrorMessageObserver()
 
+            homeViewModel.charactersList.observe(viewLifecycleOwner) {
+                characterAdapter.submitData(lifecycle, it)
+            }
+
         }
 
     }
 
-    private fun FragmentHomeBinding.setOnRefreshListener() {
-        swipeRefreshLayout.setOnRefreshListener {
-            homeViewModel.refreshCharactersList()
-            setupCharactersListObserver()
-            homeViewModel.fetchFirstFiveCharacters()
-        }
-    }
+//    private fun FragmentHomeBinding.setOnRefreshListener() {
+//        swipeRefreshLayout.setOnRefreshListener {
+//            //homeViewModel.refreshCharactersList()
+//            setupCharactersListObserver()
+//            homeViewModel.fetchFirstFiveCharacters()
+//        }
+//    }
 
     private fun FragmentHomeBinding.getFirstFiveCharacters() {
         homeViewModel.firstFiveCharactersList.observe(viewLifecycleOwner) { characters ->

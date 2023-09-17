@@ -1,4 +1,4 @@
-package com.erickpimentel.marvelapp.data.dto
+package com.erickpimentel.marvelapp.data.remote.dto
 
 import com.erickpimentel.marvelapp.domain.model.Character
 
@@ -21,8 +21,7 @@ data class Result(
             name = name,
             description = description,
             thumbnail = thumbnail.path,
-            thumbnailExtension = thumbnail.extension,
-            comics = comics.items.map { it.name }
+            thumbnailExtension = thumbnail.extension
         )
     }
 }
