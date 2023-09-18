@@ -1,13 +1,13 @@
 # MarvelApp
 ## Project Overview
-MarvelApp is an Android application developed using MVVM (Model-View-ViewModel) and Clean Architecture. The project incorporates essential best practices and technologies:
+MarvelApp is an Android application developed using MVVM (Model-View-ViewModel) and Clean Architecture. The project incorporates the best practices and technologies:
 
 - **Minimum SDK Version:** 21
 - **Design for Smaller Devices:** Designed to provide a consistent experience on smaller devices, ensuring responsive UI design.
 - **Kotlin:** Implemented using the Kotlin programming language, known for its conciseness, safety, and interoperability with Java.
 - **Coroutines:** Kotlin Coroutines are used to efficiently handle asynchronous operations within the application, enhancing responsiveness and performance.
 - **Image Caching:** Makes effective use of the Glide library to implement image caching mechanism, optimizing image loading and display.
-- **Error Handling:** Effective error handling strategies are integrated
+- **Error Handling:** Incorporates effective strategies for handling errors.
 - **Design Patterns and Object-Oriented Practices:** The project follows established design patterns and object-oriented programming principles to ensure maintainability and extensibility.
 - **Android Architecture Components (AAC):** Utilizes Google's Android Architecture Components for building a robust and well-structured app, utilizing the following key components:
   - **Lifecycle:** Manages the lifecycle of UI-related components, ensuring efficient management of activity and fragment lifecycles.
@@ -21,17 +21,17 @@ MarvelApp is an Android application developed using MVVM (Model-View-ViewModel) 
 - **Dependency Injection:** Implements Dagger Hilt to optimize dependency management, enhancing modularity and maintainability of the application.
 
 ## Features
-### - Carousel displaying 5 characters
+### Carousel displaying 5 characters
 https://github.com/ErickPimentel/MarvelApp/assets/40219991/6e568585-62f0-4635-a15e-ef9cf5d3783c
 
-### - Infinite scrollable vertical list below the carousel featuring the following characters without repetition
+### An infinite scrollable vertical list using Paging 3 displaying the following characters
 https://github.com/ErickPimentel/MarvelApp/assets/40219991/500f3571-a48a-4223-b7b6-3c096b824f9f
 
-### - Search
+### Search
 https://github.com/ErickPimentel/MarvelApp/assets/40219991/a683ca06-a28e-48ab-8e7a-076bf82df964
 
-### - Search suggestions
-
+### Search suggestions
+https://github.com/ErickPimentel/MarvelApp/assets/40219991/73232a97-7c65-4048-8a6f-fd4eb305e637
 
 ## How to Run the Project
 To run the MarvelApp, follow these steps:
