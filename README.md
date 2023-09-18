@@ -22,16 +22,16 @@ MarvelApp is an Android application developed using MVVM (Model-View-ViewModel) 
 
 ## Features
 ### Carousel displaying 5 characters
-https://github.com/ErickPimentel/MarvelApp/assets/40219991/01f79b77-e88b-415d-b36d-ac2b0f2cb67e
+https://github.com/ErickPimentel/MarvelApp/assets/40219991/832c996c-01ec-4e47-a185-4dc4cf8dbf3c
 
-### An infinite scrollable vertical list using Paging 3 displaying the following characters
-https://github.com/ErickPimentel/MarvelApp/assets/40219991/883fee19-19d1-4e81-84f1-48fb04c4b0ca
+### Infinite scrollable vertical list using Paging 3 displaying the following characters
+https://github.com/ErickPimentel/MarvelApp/assets/40219991/84a60562-a94a-483a-91ac-fc245e08bf5b
 
 ### Search
-https://github.com/ErickPimentel/MarvelApp/assets/40219991/9b7ca865-1a02-44d0-b169-ecaabae17aff
+https://github.com/ErickPimentel/MarvelApp/assets/40219991/fd002ae0-dff7-47fa-86bf-b270b61bb913
 
 ### Search suggestions
-https://github.com/ErickPimentel/MarvelApp/assets/40219991/01614e12-62ad-4c6b-b715-fda5f59e248b
+https://github.com/ErickPimentel/MarvelApp/assets/40219991/1ef92ad3-a89f-4726-aa58-a2e1f697142b
 
 ## How to Run the Project
 To run the MarvelApp, follow these steps:
