@@ -20,6 +20,19 @@ MarvelApp is an Android application developed using MVVM (Model-View-ViewModel) 
 - **Layouts and User Interface (UI) Optimization with Constraints:** Utilizes Constraints to create responsive and consistent user interfaces.
 - **Dependency Injection:** Implements Dagger Hilt to optimize dependency management, enhancing modularity and maintainability of the application.
 
+## Features
+### - Carousel displaying 5 characters
+https://github.com/ErickPimentel/MarvelApp/assets/40219991/6e568585-62f0-4635-a15e-ef9cf5d3783c
+
+### - Infinite scrollable vertical list below the carousel featuring the following characters without repetition
+https://github.com/ErickPimentel/MarvelApp/assets/40219991/500f3571-a48a-4223-b7b6-3c096b824f9f
+
+### - Search
+https://github.com/ErickPimentel/MarvelApp/assets/40219991/a683ca06-a28e-48ab-8e7a-076bf82df964
+
+### - Search suggestions
+
+
 ## How to Run the Project
 To run the MarvelApp, follow these steps:
 
